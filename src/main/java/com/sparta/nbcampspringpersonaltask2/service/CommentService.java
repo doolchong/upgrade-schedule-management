@@ -6,6 +6,7 @@ import com.sparta.nbcampspringpersonaltask2.entity.Comment;
 import com.sparta.nbcampspringpersonaltask2.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class CommentService {
         return scheduleService.findScheduleById(scheduleId).getComments().stream().map(CommentResponseDto::new).toList();
     }
 
+    @Transactional
     public void update(Long scheduleId, Long commentId, CommentRequestDto commentRequestDto) {
         scheduleService.findScheduleById(scheduleId);
 
