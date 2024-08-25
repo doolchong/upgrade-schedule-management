@@ -2,14 +2,11 @@ package com.sparta.nbcampspringpersonaltask2.controller;
 
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleResponseDto;
-import com.sparta.nbcampspringpersonaltask2.entity.Schedule;
 import com.sparta.nbcampspringpersonaltask2.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor

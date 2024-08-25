@@ -27,17 +27,15 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleResponseDto update(Long scheduleId, ScheduleRequestDto scheduleRequestDto) {
+    public void update(Long scheduleId, ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = findScheduleById(scheduleId);
 
         schedule.updateSchedule(scheduleRequestDto);
-
-        return getSchedule(scheduleId);
     }
 
     public Schedule findScheduleById(Long scheduleId) {
         return scheduleRepository.findById(scheduleId).orElseThrow(() ->
-                new IllegalArgumentException("선택한 메모는 존재하지 않습니다.")
+                new IllegalArgumentException("선택한 일정은 존재하지 않습니다.")
         );
     }
 }

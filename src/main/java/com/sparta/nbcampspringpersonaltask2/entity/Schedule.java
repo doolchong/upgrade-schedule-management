@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -26,6 +29,9 @@ public class Schedule extends Timestamped {
 
     @Column(name = "schedule_content", length = 500)
     private String scheduleContent;
+
+    @OneToMany(mappedBy = "schedule")
+    private List<Comment> comments = new ArrayList<Comment>();
 
     public Schedule(ScheduleRequestDto scheduleRequestDto) {
         this.writerName = scheduleRequestDto.getWriterName();
