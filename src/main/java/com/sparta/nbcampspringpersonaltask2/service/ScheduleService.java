@@ -12,18 +12,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final UsersAndSchedulesService usersAndSchedulesService;
 
     public ScheduleResponseDto create(ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = new Schedule(scheduleRequestDto);
 
         Schedule saveSchedule = scheduleRepository.save(schedule);
+
+        usersAndSchedulesService.add(scheduleRequestDto.getUserId(), saveSchedule);
 
         return new ScheduleResponseDto(saveSchedule);
     }
@@ -49,6 +50,10 @@ public class ScheduleService {
 
     public void delete(Long scheduleId) {
         scheduleRepository.delete(findScheduleById(scheduleId));
+    }
+
+    public void addUserToSchedule(Long scheduleId, Long userId) {
+        usersAndSchedulesService.add(userId, findScheduleById(scheduleId));
     }
 
     public Schedule findScheduleById(Long scheduleId) {

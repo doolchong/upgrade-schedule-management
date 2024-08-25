@@ -9,11 +9,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@RequiredArgsConstructor
 public class SchedulesResponseDto {
 
-    private final String writerName;
+    private final Long userId;
     private final String scheduleTitle;
     private final String scheduleContent;
     private final LocalDateTime createdAt;
@@ -21,7 +19,7 @@ public class SchedulesResponseDto {
     private final int numberOfComments;
 
     public SchedulesResponseDto(Schedule schedule) {
-        writerName = schedule.getWriterName();
+        userId = schedule.getUserId();
         scheduleTitle = schedule.getScheduleTitle();
         scheduleContent = schedule.getScheduleContent();
         createdAt = schedule.getCreatedAt();

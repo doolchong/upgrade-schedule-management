@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -18,7 +21,7 @@ public class Comment extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long comment_id;
 
-    @Column(name = "comment")
+    @Column(name = "comment", length = 500)
     private String comment;
 
     @Column(name = "writer_name")

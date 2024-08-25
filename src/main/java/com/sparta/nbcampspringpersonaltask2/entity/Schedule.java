@@ -21,8 +21,8 @@ public class Schedule extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleId;
 
-    @Column(name = "writer_name")
-    private String writerName;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "schedule_title")
     private String scheduleTitle;
@@ -34,13 +34,13 @@ public class Schedule extends Timestamped {
     private List<Comment> comments = new ArrayList<Comment>();
 
     public Schedule(ScheduleRequestDto scheduleRequestDto) {
-        this.writerName = scheduleRequestDto.getWriterName();
+        this.userId = scheduleRequestDto.getUserId();
         this.scheduleTitle = scheduleRequestDto.getScheduleTitle();
         this.scheduleContent = scheduleRequestDto.getScheduleContent();
     }
 
     public void updateSchedule(ScheduleRequestDto scheduleRequestDto) {
-        this.writerName = scheduleRequestDto.getWriterName();
+        this.userId = scheduleRequestDto.getUserId();
         this.scheduleTitle = scheduleRequestDto.getScheduleTitle();
         this.scheduleContent = scheduleRequestDto.getScheduleContent();
     }

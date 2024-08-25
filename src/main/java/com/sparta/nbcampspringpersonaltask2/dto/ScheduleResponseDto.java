@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 public class ScheduleResponseDto {
 
-    private final String writerName;
+    private final Long userId;
     private final String scheduleTitle;
     private final String scheduleContent;
     private final LocalDateTime createdAt;
@@ -19,7 +19,7 @@ public class ScheduleResponseDto {
     private final List<CommentResponseDto> comments;
 
     public ScheduleResponseDto(Schedule schedule) {
-        this.writerName = schedule.getWriterName();
+        this.userId = schedule.getUserId();
         this.scheduleTitle = schedule.getScheduleTitle();
         this.scheduleContent = schedule.getScheduleContent();
         this.createdAt = schedule.getCreatedAt();
