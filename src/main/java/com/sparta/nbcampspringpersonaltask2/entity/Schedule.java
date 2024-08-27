@@ -30,8 +30,11 @@ public class Schedule extends Timestamped {
     @Column(name = "schedule_content", length = 500)
     private String scheduleContent;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
-    private List<Comment> comments = new ArrayList<Comment>();
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<UsersAndSchedules> usersAndSchedules;
 
     public Schedule(ScheduleRequestDto scheduleRequestDto) {
         this.userId = scheduleRequestDto.getUserId();

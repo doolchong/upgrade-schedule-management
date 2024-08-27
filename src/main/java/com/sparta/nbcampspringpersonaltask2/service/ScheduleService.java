@@ -25,20 +25,26 @@ public class ScheduleService {
         Schedule saveSchedule = scheduleRepository.save(schedule);
 
         usersAndSchedulesService.add(scheduleRequestDto.getUserId(), saveSchedule);
+        
+        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(saveSchedule);
+        scheduleResponseDto.setUsers(usersAndSchedulesService.getUsers(findScheduleById(scheduleRequestDto.getUserId())));
 
-        return new ScheduleResponseDto(saveSchedule);
+        return scheduleResponseDto;
     }
 
     public ScheduleResponseDto getSchedule(Long scheduleId) {
-        return new ScheduleResponseDto(findScheduleById(scheduleId));
+        Schedule schedule = findScheduleById(scheduleId);
+
+        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
+        scheduleResponseDto.setUsers(usersAndSchedulesService.getUsers(findScheduleById(scheduleId)));
+
+        return scheduleResponseDto;
     }
 
     public Page<SchedulesResponseDto> getSchedules(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Schedule> schedules = scheduleRepository.findAll(pageable);
-
-        return schedules.map(SchedulesResponseDto::new);
+        return scheduleRepository.findAll(pageable).map(SchedulesResponseDto::new);
     }
 
     @Transactional

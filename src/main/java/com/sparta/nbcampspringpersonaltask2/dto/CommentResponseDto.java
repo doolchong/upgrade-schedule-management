@@ -2,7 +2,6 @@ package com.sparta.nbcampspringpersonaltask2.dto;
 
 import com.sparta.nbcampspringpersonaltask2.entity.Comment;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 

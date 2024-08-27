@@ -20,19 +20,32 @@ public class User extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
 
-    @Column(name = "email")
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    public User(UserRequestDto userRequestDto) {
-        userName = userRequestDto.getUserName();
-        email = userRequestDto.getEmail();
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING) // USER -> USER
+    private UserRoleEnum role;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UsersAndSchedules> usersAndSchedules;
+
+    public User(String userName, String password, String email, UserRoleEnum role) {
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
+        this.role = role;
     }
 
     public void updateUser(UserRequestDto userRequestDto) {
         userName = userRequestDto.getUserName();
+        password = userRequestDto.getPassword();
         email = userRequestDto.getEmail();
     }
 }

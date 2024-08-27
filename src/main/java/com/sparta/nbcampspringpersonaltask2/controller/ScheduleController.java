@@ -3,8 +3,6 @@ package com.sparta.nbcampspringpersonaltask2.controller;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleResponseDto;
 import com.sparta.nbcampspringpersonaltask2.dto.SchedulesResponseDto;
-import com.sparta.nbcampspringpersonaltask2.dto.UserResponseDto;
-import com.sparta.nbcampspringpersonaltask2.entity.User;
 import com.sparta.nbcampspringpersonaltask2.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,7 +43,7 @@ public class ScheduleController {
         scheduleService.delete(scheduleId);
     }
 
-    @PostMapping("/schedule/{scheduleId}/user/{userId}")
+    @GetMapping("/schedule/{scheduleId}/user/{userId}")
     public void addUserToSchedule(@PathVariable Long scheduleId, @PathVariable Long userId) {
         scheduleService.addUserToSchedule(scheduleId, userId);
     }

@@ -2,7 +2,6 @@ package com.sparta.nbcampspringpersonaltask2.controller;
 
 import com.sparta.nbcampspringpersonaltask2.dto.CommentRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.CommentResponseDto;
-import com.sparta.nbcampspringpersonaltask2.entity.Comment;
 import com.sparta.nbcampspringpersonaltask2.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
