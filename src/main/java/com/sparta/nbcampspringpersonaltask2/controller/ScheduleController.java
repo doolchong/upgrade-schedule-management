@@ -4,6 +4,7 @@ import com.sparta.nbcampspringpersonaltask2.dto.ScheduleRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleResponseDto;
 import com.sparta.nbcampspringpersonaltask2.dto.SchedulesResponseDto;
 import com.sparta.nbcampspringpersonaltask2.service.ScheduleService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/schedule")
-    public ResponseEntity<ScheduleResponseDto> create(@RequestBody ScheduleRequestDto scheduleRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.create(scheduleRequestDto));
+    public ResponseEntity<ScheduleResponseDto> create(@RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.create(servletRequest, scheduleRequestDto));
     }
 
     @GetMapping("/schedule/{scheduleId}")

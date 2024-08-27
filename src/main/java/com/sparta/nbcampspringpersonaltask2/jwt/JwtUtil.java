@@ -78,6 +78,7 @@ public class JwtUtil {
 
     // Cookie에 들어있던 JWT 토큰을 Substring
     public String substringToken(String tokenValue) {
+        System.out.println(tokenValue);
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }

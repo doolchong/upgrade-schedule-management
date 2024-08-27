@@ -18,4 +18,11 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseDto);
     }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ExceptionResponseDto> handleIllegalArgumentException(SecurityException e, HttpServletRequest request) {
+        ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto(HttpStatus.FORBIDDEN, e.getMessage(), URI.create(request.getRequestURI()));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponseDto);
+    }
 }
