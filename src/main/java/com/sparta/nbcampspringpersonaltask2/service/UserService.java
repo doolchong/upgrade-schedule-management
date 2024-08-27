@@ -1,13 +1,16 @@
 package com.sparta.nbcampspringpersonaltask2.service;
 
 import com.sparta.nbcampspringpersonaltask2.config.PasswordEncoder;
-import com.sparta.nbcampspringpersonaltask2.dto.SignUpResponseDto;
+import com.sparta.nbcampspringpersonaltask2.dto.JwtTokenResponseDto;
+import com.sparta.nbcampspringpersonaltask2.dto.LoginRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.UserRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.UserResponseDto;
 import com.sparta.nbcampspringpersonaltask2.entity.User;
 import com.sparta.nbcampspringpersonaltask2.entity.UserRoleEnum;
 import com.sparta.nbcampspringpersonaltask2.jwt.JwtUtil;
 import com.sparta.nbcampspringpersonaltask2.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +29,7 @@ public class UserService {
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
-    public SignUpResponseDto create(UserRequestDto userRequestDto) {
+    public JwtTokenResponseDto create(UserRequestDto userRequestDto) {
         String userName = userRequestDto.getUserName();
         String password = passwordEncoder.encode(userRequestDto.getPassword());
 
@@ -56,7 +59,29 @@ public class UserService {
 
         User saveUser = userRepository.save(user);
 
-        return new SignUpResponseDto(saveUser.getPassword());
+        return new JwtTokenResponseDto(saveUser.getPassword());
+    }
+
+    public JwtTokenResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpServletRequest request) {
+        String email = loginRequestDto.getEmail();
+        String password = loginRequestDto.getPassword();
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // 사용자 확인
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+        );
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // JWT 생성 및 쿠키에 저장 후 Response 객체에 추가
+        String token = jwtUtil.createToken(user.getUserName(), user.getRole());
+        jwtUtil.addJwtToCookie(token, response);
+
+        return new JwtTokenResponseDto(token);
     }
 
     public UserResponseDto getUser(Long userId) {
