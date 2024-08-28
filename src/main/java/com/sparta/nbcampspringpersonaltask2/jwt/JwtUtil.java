@@ -78,12 +78,11 @@ public class JwtUtil {
 
     // Cookie에 들어있던 JWT 토큰을 Substring
     public String substringToken(String tokenValue) {
-        System.out.println(tokenValue);
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }
-        logger.error("Not Found Token");
-        throw new NullPointerException("Not Found Token");
+        logger.error("토큰이 없습니다.");
+        throw new NullPointerException("토큰이 없습니다.");
     }
 
     // JWT 토큰 검증

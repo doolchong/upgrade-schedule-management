@@ -16,6 +16,7 @@ public class ScheduleResponseDto {
     private final String scheduleContent;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
+    private final String weather;
     private List<UserResponseDto> users;
     private final List<CommentResponseDto> comments;
 
@@ -25,6 +26,7 @@ public class ScheduleResponseDto {
         scheduleContent = schedule.getScheduleContent();
         createdAt = schedule.getCreatedAt();
         modifiedAt = schedule.getModifiedAt();
+        weather = schedule.getWeather();
         comments = schedule.getComments().stream().map(CommentResponseDto::new).toList();
     }
 }

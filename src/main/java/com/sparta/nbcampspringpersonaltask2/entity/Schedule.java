@@ -30,6 +30,9 @@ public class Schedule extends Timestamped {
     @Column(name = "schedule_content", length = 500)
     private String scheduleContent;
 
+    @Column(name = "weather")
+    private String weather;
+
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 

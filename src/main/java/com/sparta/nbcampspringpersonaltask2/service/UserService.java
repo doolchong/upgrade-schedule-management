@@ -9,6 +9,7 @@ import com.sparta.nbcampspringpersonaltask2.entity.User;
 import com.sparta.nbcampspringpersonaltask2.entity.UserRoleEnum;
 import com.sparta.nbcampspringpersonaltask2.jwt.JwtUtil;
 import com.sparta.nbcampspringpersonaltask2.repository.UserRepository;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -65,16 +66,15 @@ public class UserService {
     public JwtTokenResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpServletRequest request) {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
-        String authorizationHeader = request.getHeader("Authorization");
 
         // 사용자 확인
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+                () -> new SignatureException("등록된 사용자가 없습니다.")
         );
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new SignatureException("비밀번호가 일치하지 않습니다.");
         }
 
         // JWT 생성 및 쿠키에 저장 후 Response 객체에 추가

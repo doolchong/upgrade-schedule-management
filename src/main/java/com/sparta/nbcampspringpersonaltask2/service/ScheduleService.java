@@ -4,20 +4,20 @@ import com.sparta.nbcampspringpersonaltask2.dto.ScheduleRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleResponseDto;
 import com.sparta.nbcampspringpersonaltask2.dto.SchedulesResponseDto;
 import com.sparta.nbcampspringpersonaltask2.entity.Schedule;
-import com.sparta.nbcampspringpersonaltask2.entity.UserRoleEnum;
 import com.sparta.nbcampspringpersonaltask2.jwt.JwtUtil;
 import com.sparta.nbcampspringpersonaltask2.repository.ScheduleRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +26,15 @@ public class ScheduleService {
     private final JwtUtil jwtUtil;
     private final ScheduleRepository scheduleRepository;
     private final UsersAndSchedulesService usersAndSchedulesService;
+    private final WeatherService weatherService;
 
     public ScheduleResponseDto create(HttpServletRequest servletRequest, ScheduleRequestDto scheduleRequestDto) {
-        Cookie[] list = servletRequest.getCookies();
-
-        if (!isAdmin(list[0].getValue())) {
-            throw new SecurityException(list[0].getValue());
+        if (!isAdmin(jwtUtil.getTokenFromRequest(servletRequest))) {
+            throw new SecurityException("권한이 없습니다.");
         }
 
         Schedule schedule = new Schedule(scheduleRequestDto);
+        schedule.setWeather(weatherService.getCallWeather(LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd"))));
 
         Schedule saveSchedule = scheduleRepository.save(schedule);
 
@@ -56,7 +56,7 @@ public class ScheduleService {
     }
 
     public Page<SchedulesResponseDto> getSchedules(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
 
         return scheduleRepository.findAll(pageable).map(SchedulesResponseDto::new);
     }
@@ -83,16 +83,13 @@ public class ScheduleService {
     }
 
     private boolean isAdmin(String token) {
+        token = jwtUtil.substringToken(token);
+        Claims claims = jwtUtil.getUserInfoFromToken(token);
 
-        if (token != null && token.startsWith("Bearer%")) {
-            token = token.substring(9);
-            Claims claims = jwtUtil.getUserInfoFromToken(token);
+        String role = claims.get("auth", String.class);
 
-            String role = claims.get("auth", String.class);
-
-            if ("ADMIN".equals(role)) {
-                return true;
-            }
+        if ("ADMIN".equals(role)) {
+            return true;
         }
         return false;
     }

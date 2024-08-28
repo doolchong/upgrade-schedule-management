@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 
 @Slf4j(topic = "AuthFilter")
 @Component
@@ -59,10 +60,12 @@ public class AuthFilter implements Filter {
                 // 토큰에서 사용자 정보 가져오기
                 Claims info = jwtUtil.getUserInfoFromToken(token);
 
-                User user = userRepository.findByUserName(info.getSubject()).orElseThrow(() ->
-                        new NullPointerException("사용자를 찾을 수 없습니다.")
-                );
+                Optional<User> user = userRepository.findByUserName(info.getSubject());
 
+                if (user.isEmpty()) {
+                    notFoundTokenExceptionHandler(response, "사용자를 찾을 수 없습니다.", url);
+                }
+                
                 request.setAttribute("user", user);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
             } else {
@@ -73,6 +76,7 @@ public class AuthFilter implements Filter {
 
     private void notFoundTokenExceptionHandler(ServletResponse response, String message, String url) {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setContentType("application/json; charset=UTF-8");
         ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto(HttpStatus.BAD_REQUEST, message, URI.create(url));
         try {
             String json = new ObjectMapper().writeValueAsString(exceptionResponseDto);
@@ -84,6 +88,7 @@ public class AuthFilter implements Filter {
 
     private void tokenErrorExceptionHandler(ServletResponse response, String message, String url) {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setContentType("application/json; charset=UTF-8");
         ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto(HttpStatus.UNAUTHORIZED, message, URI.create(url));
         try {
             String json = new ObjectMapper().writeValueAsString(exceptionResponseDto);
