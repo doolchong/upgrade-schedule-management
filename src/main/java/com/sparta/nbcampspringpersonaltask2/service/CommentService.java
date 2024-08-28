@@ -25,10 +25,11 @@ public class CommentService {
         return new CommentResponseDto(saveComment);
     }
 
-    public CommentResponseDto getComment(Long scheduleId, Long commentId) {
-        scheduleService.findScheduleById(scheduleId);
-
-        return new CommentResponseDto(findCommentById(commentId));
+    public CommentResponseDto getComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+                new IllegalArgumentException("해당하는 댓글이 없습니다.")
+        );
+        return new CommentResponseDto(comment);
     }
 
     public List<CommentResponseDto> getComments(Long scheduleId) {
@@ -36,17 +37,13 @@ public class CommentService {
     }
 
     @Transactional
-    public void update(Long scheduleId, Long commentId, CommentRequestDto commentRequestDto) {
-        scheduleService.findScheduleById(scheduleId);
-
+    public void update(Long commentId, CommentRequestDto commentRequestDto) {
         Comment comment = findCommentById(commentId);
 
         comment.updateComment(commentRequestDto);
     }
 
-    public void delete(Long scheduleId, Long commentId) {
-        scheduleService.findScheduleById(scheduleId);
-
+    public void delete(Long commentId) {
         commentRepository.delete(findCommentById(commentId));
     }
 

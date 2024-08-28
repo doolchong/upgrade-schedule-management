@@ -12,5 +12,5 @@ public interface UsersAndSchedulesRepository extends JpaRepository<UsersAndSched
 
     Page<UsersAndSchedules> findAll(Pageable pageable);
 
-    List<UsersAndSchedules> findAllBySchedule(Schedule schedule);
+    List<UsersAndSchedules> findAllBySchedule_ScheduleId(Long scheduleId);
 }

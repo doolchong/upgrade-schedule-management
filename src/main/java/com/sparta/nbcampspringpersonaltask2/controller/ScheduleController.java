@@ -34,8 +34,8 @@ public class ScheduleController {
     }
 
     @PutMapping("/schedule/{scheduleId}")
-    public ResponseEntity<ScheduleResponseDto> update(@PathVariable Long scheduleId, @RequestBody ScheduleRequestDto scheduleRequestDto) {
-        scheduleService.update(scheduleId, scheduleRequestDto);
+    public ResponseEntity<ScheduleResponseDto> update(@PathVariable Long scheduleId, @RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
+        scheduleService.update(scheduleId, scheduleRequestDto, servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedule(scheduleId)); // 업데이트 후 수정일은 바로 적용이 안되길래 getSchedule로 가져옴
     }
 

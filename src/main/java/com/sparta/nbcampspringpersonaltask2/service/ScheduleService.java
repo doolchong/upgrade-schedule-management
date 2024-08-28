@@ -4,6 +4,7 @@ import com.sparta.nbcampspringpersonaltask2.dto.ScheduleRequestDto;
 import com.sparta.nbcampspringpersonaltask2.dto.ScheduleResponseDto;
 import com.sparta.nbcampspringpersonaltask2.dto.SchedulesResponseDto;
 import com.sparta.nbcampspringpersonaltask2.entity.Schedule;
+import com.sparta.nbcampspringpersonaltask2.entity.UserRoleEnum;
 import com.sparta.nbcampspringpersonaltask2.jwt.JwtUtil;
 import com.sparta.nbcampspringpersonaltask2.repository.ScheduleRepository;
 import io.jsonwebtoken.Claims;
@@ -62,7 +63,11 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void update(Long scheduleId, ScheduleRequestDto scheduleRequestDto) {
+    public void update(Long scheduleId, ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
+        if (!isAdmin(jwtUtil.getTokenFromRequest(servletRequest))) {
+            throw new SecurityException("권한이 없습니다.");
+        }
+
         Schedule schedule = findScheduleById(scheduleId);
 
         schedule.updateSchedule(scheduleRequestDto);
@@ -88,7 +93,7 @@ public class ScheduleService {
 
         String role = claims.get("auth", String.class);
 
-        if ("ADMIN".equals(role)) {
+        if (UserRoleEnum.ADMIN.getAuthority().equals(role)) {
             return true;
         }
         return false;

@@ -25,7 +25,7 @@ public class UsersAndSchedulesService {
     }
 
     public List<UserResponseDto> getUsers(Schedule schedule) {
-        List<User> list = usersAndSchedulesRepository.findAllBySchedule(schedule).stream().map(UsersAndSchedules::getUser).toList();
+        List<User> list = usersAndSchedulesRepository.findAllBySchedule_ScheduleId(schedule.getScheduleId()).stream().map(UsersAndSchedules::getUser).toList();
         List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         for (User user : list) {
             UserResponseDto userResponseDto = new UserResponseDto(user);

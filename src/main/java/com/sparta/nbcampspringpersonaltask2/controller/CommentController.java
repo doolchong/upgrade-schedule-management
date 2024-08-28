@@ -22,9 +22,9 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.create(scheduleId, commentRequestDto));
     }
 
-    @GetMapping("/{scheduleId}/comment/{commentId}")
-    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long scheduleId, @PathVariable Long commentId) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(scheduleId, commentId));
+    @GetMapping("/comment/{commentId}")
+    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long commentId) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(commentId));
     }
 
     @GetMapping("/{scheduleId}/comment")
@@ -33,15 +33,15 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
-    @PutMapping("/{scheduleId}/comment/{commentId}")
-    public ResponseEntity<CommentResponseDto> update(@PathVariable Long scheduleId, @PathVariable Long commentId, @RequestBody CommentRequestDto commentRequestDto) {
-        commentService.update(scheduleId, commentId, commentRequestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(scheduleId, commentId));
+    @PutMapping("/comment/{commentId}")
+    public ResponseEntity<CommentResponseDto> update(@PathVariable Long commentId, @RequestBody CommentRequestDto commentRequestDto) {
+        commentService.update(commentId, commentRequestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(commentId));
     }
 
-    @DeleteMapping("/{scheduleId}/comment/{commentId}")
-    public void delete(@PathVariable Long scheduleId, @PathVariable Long commentId) {
-        commentService.delete(scheduleId, commentId);
+    @DeleteMapping("/comment/{commentId}")
+    public void delete(@PathVariable Long commentId) {
+        commentService.delete(commentId);
     }
 
 }
