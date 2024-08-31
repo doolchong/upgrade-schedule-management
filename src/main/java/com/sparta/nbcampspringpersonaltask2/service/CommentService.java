@@ -11,47 +11,48 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final ScheduleService scheduleService;
 
-    public CommentResponseDto create(Long schedule_id, CommentRequestDto commentRequestDto) {
+    @Transactional
+    public CommentResponseDto create(long schedule_id, CommentRequestDto commentRequestDto) {
         Comment comment = new Comment(commentRequestDto, scheduleService.findScheduleById(schedule_id));
 
         Comment saveComment = commentRepository.save(comment);
 
-        return new CommentResponseDto(saveComment);
+        return CommentResponseDto.commentToDto(saveComment);
     }
 
-    public CommentResponseDto getComment(Long commentId) {
+    public CommentResponseDto getComment(long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new IllegalArgumentException("해당하는 댓글이 없습니다.")
         );
-        return new CommentResponseDto(comment);
+        return CommentResponseDto.commentToDto(comment);
     }
 
-    public List<CommentResponseDto> getComments(Long scheduleId) {
-        return scheduleService.findScheduleById(scheduleId).getComments().stream().map(CommentResponseDto::new).toList();
+    public List<CommentResponseDto> getCommentList(long scheduleId) {
+        return scheduleService.findScheduleById(scheduleId).getComments().stream().map(CommentResponseDto::commentToDto).toList();
     }
 
     @Transactional
-    public void update(Long commentId, CommentRequestDto commentRequestDto) {
+    public void update(long commentId, CommentRequestDto commentRequestDto) {
         Comment comment = findCommentById(commentId);
 
         comment.updateComment(commentRequestDto);
     }
 
-    public void delete(Long commentId) {
+    @Transactional
+    public void delete(long commentId) {
         commentRepository.delete(findCommentById(commentId));
     }
 
-    public Comment findCommentById(Long scheduleId) {
+    public Comment findCommentById(long scheduleId) {
         return commentRepository.findById(scheduleId).orElseThrow(() ->
                 new IllegalArgumentException("선택한 댓글은 존재하지 않습니다.")
         );
     }
-
-
 }

@@ -2,10 +2,12 @@ package com.sparta.nbcampspringpersonaltask2.dto;
 
 import com.sparta.nbcampspringpersonaltask2.entity.User;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@RequiredArgsConstructor
 public class UserResponseDto {
 
     private final Long userId;
@@ -14,12 +16,13 @@ public class UserResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public UserResponseDto(User user) {
-        userId = user.getUserId();
-        userName = user.getUserName();
-        email = user.getEmail();
-        createdAt = user.getCreatedAt();
-        modifiedAt = user.getModifiedAt();
+    public static UserResponseDto entityToDto(User user) {
+        return new UserResponseDto(
+                user.getUserId(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getModifiedAt()
+        );
     }
-
 }

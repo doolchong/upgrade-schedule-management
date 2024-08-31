@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@RequiredArgsConstructor
 public class SchedulesResponseDto {
 
     private final Long userId;
@@ -18,14 +19,16 @@ public class SchedulesResponseDto {
     private final String scheduleContent;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
-    private final Long comments;
+    private final int comments;
 
-    public SchedulesResponseDto(Schedule schedule) {
-        userId = schedule.getUserId();
-        scheduleTitle = schedule.getScheduleTitle();
-        scheduleContent = schedule.getScheduleContent();
-        createdAt = schedule.getCreatedAt();
-        modifiedAt = schedule.getModifiedAt();
-        comments = (long) schedule.getComments().size();
+    public static SchedulesResponseDto entityToDto(Schedule schedule) {
+        return new SchedulesResponseDto(
+                schedule.getUserId(),
+                schedule.getScheduleTitle(),
+                schedule.getScheduleContent(),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt(),
+                schedule.getComments().size()
+        );
     }
 }

@@ -18,29 +18,29 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{scheduleId}/comment")
-    public ResponseEntity<CommentResponseDto> create(@PathVariable Long scheduleId, @RequestBody CommentRequestDto commentRequestDto) {
+    public ResponseEntity<CommentResponseDto> create(@PathVariable long scheduleId, @RequestBody CommentRequestDto commentRequestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.create(scheduleId, commentRequestDto));
     }
 
     @GetMapping("/comment/{commentId}")
-    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long commentId) {
+    public ResponseEntity<CommentResponseDto> getComment(@PathVariable long commentId) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(commentId));
     }
 
     @GetMapping("/{scheduleId}/comment")
-    public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long scheduleId) {
-        List<CommentResponseDto> comments = commentService.getComments(scheduleId);
+    public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable long scheduleId) {
+        List<CommentResponseDto> comments = commentService.getCommentList(scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
     @PutMapping("/comment/{commentId}")
-    public ResponseEntity<CommentResponseDto> update(@PathVariable Long commentId, @RequestBody CommentRequestDto commentRequestDto) {
+    public ResponseEntity<CommentResponseDto> update(@PathVariable long commentId, @RequestBody CommentRequestDto commentRequestDto) {
         commentService.update(commentId, commentRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getComment(commentId));
     }
 
     @DeleteMapping("/comment/{commentId}")
-    public void delete(@PathVariable Long commentId) {
+    public void delete(@PathVariable long commentId) {
         commentService.delete(commentId);
     }
 

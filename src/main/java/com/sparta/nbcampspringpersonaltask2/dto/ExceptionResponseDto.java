@@ -15,4 +15,8 @@ public class ExceptionResponseDto {
     private final HttpStatus status;
     private final String error;
     private final URI path;
+
+    public static ExceptionResponseDto makeExceptionDto(HttpStatus status, String error, URI path) {
+        return new ExceptionResponseDto(status, error, path);
+    }
 }

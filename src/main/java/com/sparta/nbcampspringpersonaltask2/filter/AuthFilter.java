@@ -1,22 +1,18 @@
 package com.sparta.nbcampspringpersonaltask2.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.nbcampspringpersonaltask2.dto.ExceptionResponseDto;
 import com.sparta.nbcampspringpersonaltask2.entity.User;
 import com.sparta.nbcampspringpersonaltask2.jwt.JwtUtil;
 import com.sparta.nbcampspringpersonaltask2.repository.UserRepository;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 
 @Slf4j(topic = "AuthFilter")
@@ -35,6 +31,7 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String url = httpServletRequest.getRequestURI();
 
         if (StringUtils.hasText(url) &&
@@ -53,8 +50,28 @@ public class AuthFilter implements Filter {
                 String token = jwtUtil.substringToken(tokenValue);
 
                 // 토큰 검증
-                if (!jwtUtil.validateToken(token)) {
-                    tokenErrorExceptionHandler(response, "토큰이 유효하지 않습니다.", url);
+                try {
+                    Jwts.parserBuilder().setSigningKey(jwtUtil.getKey()).build().parseClaimsJws(token);
+                } catch (SecurityException | MalformedJwtException | SignatureException e) {
+                    JwtUtil.logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+                    httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명 입니다.");
+                    return;
+                } catch (ExpiredJwtException e) {
+                    JwtUtil.logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+                    httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT token 입니다.");
+                    return;
+                } catch (UnsupportedJwtException e) {
+                    JwtUtil.logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰 입니다.");
+                    return;
+                } catch (IllegalArgumentException e) {
+                    JwtUtil.logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰 입니다.");
+                    return;
+                } catch (Exception e) {
+                    JwtUtil.logger.error("JWT 토큰 검증 중 오류가 발생했습니다.", e);
+                    httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰 검증 중 오류가 발생했습니다.");
+                    return;
                 }
 
                 // 토큰에서 사용자 정보 가져오기
@@ -63,39 +80,14 @@ public class AuthFilter implements Filter {
                 Optional<User> user = userRepository.findByUserName(info.getSubject());
 
                 if (user.isEmpty()) {
-                    notFoundTokenExceptionHandler(response, "사용자를 찾을 수 없습니다.", url);
+                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "사용자를 찾을 수 없습니다.");
                 }
-                
+
                 request.setAttribute("user", user);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
             } else {
-                notFoundTokenExceptionHandler(response, "토큰이 존재하지 않습니다.", url);
+                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "토큰이 존재하지 않습니다.");
             }
         }
     }
-
-    private void notFoundTokenExceptionHandler(ServletResponse response, String message, String url) {
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        httpServletResponse.setContentType("application/json; charset=UTF-8");
-        ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto(HttpStatus.BAD_REQUEST, message, URI.create(url));
-        try {
-            String json = new ObjectMapper().writeValueAsString(exceptionResponseDto);
-            httpServletResponse.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void tokenErrorExceptionHandler(ServletResponse response, String message, String url) {
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        httpServletResponse.setContentType("application/json; charset=UTF-8");
-        ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto(HttpStatus.UNAUTHORIZED, message, URI.create(url));
-        try {
-            String json = new ObjectMapper().writeValueAsString(exceptionResponseDto);
-            httpServletResponse.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
 }

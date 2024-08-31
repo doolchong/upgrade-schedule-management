@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -30,6 +31,7 @@ public class UserService {
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
+    @Transactional
     public JwtTokenResponseDto create(UserRequestDto userRequestDto) {
         String userName = userRequestDto.getUserName();
         String password = passwordEncoder.encode(userRequestDto.getPassword());
@@ -60,7 +62,7 @@ public class UserService {
 
         User saveUser = userRepository.save(user);
 
-        return new JwtTokenResponseDto(saveUser.getPassword());
+        return JwtTokenResponseDto.tokenToDto(saveUser.getPassword());
     }
 
     public JwtTokenResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response, HttpServletRequest request) {
@@ -81,31 +83,32 @@ public class UserService {
         String token = jwtUtil.createToken(user.getUserName(), user.getRole());
         jwtUtil.addJwtToCookie(token, response);
 
-        return new JwtTokenResponseDto(token);
+        return JwtTokenResponseDto.tokenToDto(token);
     }
 
-    public UserResponseDto getUser(Long userId) {
-        return new UserResponseDto(findUserById(userId));
+    public UserResponseDto getUser(long userId) {
+        return UserResponseDto.entityToDto(findUserById(userId));
     }
 
-    public List<UserResponseDto> getUsers() {
-        return userRepository.findAll().stream().map(UserResponseDto::new).toList();
+    public List<UserResponseDto> getUserList() {
+        return userRepository.findAll().stream().map(UserResponseDto::entityToDto).toList();
     }
 
-    public User findUserById(Long userId) {
+    public User findUserById(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new IllegalArgumentException("선택한 유저는 존재하지 않습니다.")
         );
     }
 
     @Transactional
-    public void update(Long userId, UserRequestDto userRequestDto) {
+    public void update(long userId, UserRequestDto userRequestDto) {
         User user = findUserById(userId);
 
         user.updateUser(userRequestDto);
     }
 
-    public void delete(Long userId) {
+    @Transactional
+    public void delete(long userId) {
         userRepository.delete(findUserById(userId));
     }
 }

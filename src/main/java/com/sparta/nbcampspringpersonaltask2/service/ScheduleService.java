@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ScheduleService {
 
@@ -29,6 +30,7 @@ public class ScheduleService {
     private final UsersAndSchedulesService usersAndSchedulesService;
     private final WeatherService weatherService;
 
+    @Transactional
     public ScheduleResponseDto create(HttpServletRequest servletRequest, ScheduleRequestDto scheduleRequestDto) {
         if (!isAdmin(jwtUtil.getTokenFromRequest(servletRequest))) {
             throw new SecurityException("권한이 없습니다.");
@@ -41,29 +43,23 @@ public class ScheduleService {
 
         usersAndSchedulesService.add(scheduleRequestDto.getUserId(), saveSchedule);
 
-        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(saveSchedule);
-        scheduleResponseDto.setUsers(usersAndSchedulesService.getUsers(findScheduleById(scheduleRequestDto.getUserId())));
-
-        return scheduleResponseDto;
+        return ScheduleResponseDto.entityToDto(saveSchedule, usersAndSchedulesService.getUserList(findScheduleById(scheduleRequestDto.getUserId())));
     }
 
-    public ScheduleResponseDto getSchedule(Long scheduleId) {
+    public ScheduleResponseDto getSchedule(long scheduleId) {
         Schedule schedule = findScheduleById(scheduleId);
 
-        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
-        scheduleResponseDto.setUsers(usersAndSchedulesService.getUsers(findScheduleById(scheduleId)));
-
-        return scheduleResponseDto;
+        return ScheduleResponseDto.entityToDto(schedule, usersAndSchedulesService.getUserList(findScheduleById(scheduleId)));
     }
 
-    public Page<SchedulesResponseDto> getSchedules(int page, int size) {
+    public Page<SchedulesResponseDto> getScheduleList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
 
-        return scheduleRepository.findAll(pageable).map(SchedulesResponseDto::new);
+        return scheduleRepository.findAll(pageable).map(SchedulesResponseDto::entityToDto);
     }
 
     @Transactional
-    public void update(Long scheduleId, ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
+    public void update(long scheduleId, ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
         if (!isAdmin(jwtUtil.getTokenFromRequest(servletRequest))) {
             throw new SecurityException("권한이 없습니다.");
         }
@@ -73,15 +69,17 @@ public class ScheduleService {
         schedule.updateSchedule(scheduleRequestDto);
     }
 
-    public void delete(Long scheduleId) {
+    @Transactional
+    public void delete(long scheduleId) {
         scheduleRepository.delete(findScheduleById(scheduleId));
     }
 
-    public void addUserToSchedule(Long scheduleId, Long userId) {
+    @Transactional
+    public void addUserToSchedule(long scheduleId, long userId) {
         usersAndSchedulesService.add(userId, findScheduleById(scheduleId));
     }
 
-    public Schedule findScheduleById(Long scheduleId) {
+    public Schedule findScheduleById(long scheduleId) {
         return scheduleRepository.findById(scheduleId).orElseThrow(() ->
                 new IllegalArgumentException("선택한 일정은 존재하지 않습니다.")
         );

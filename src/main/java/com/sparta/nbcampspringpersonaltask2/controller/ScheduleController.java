@@ -24,28 +24,28 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedule/{scheduleId}")
-    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long scheduleId) {
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable long scheduleId) {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedule(scheduleId));
     }
 
     @GetMapping("/schedule")
-    public ResponseEntity<Page<SchedulesResponseDto>> getSchedules(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedules(page, size));
+    public ResponseEntity<Page<SchedulesResponseDto>> getSchedules(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "10", required = false) int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getScheduleList(page, size));
     }
 
     @PutMapping("/schedule/{scheduleId}")
-    public ResponseEntity<ScheduleResponseDto> update(@PathVariable Long scheduleId, @RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
+    public ResponseEntity<ScheduleResponseDto> update(@PathVariable long scheduleId, @RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest servletRequest) {
         scheduleService.update(scheduleId, scheduleRequestDto, servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedule(scheduleId)); // 업데이트 후 수정일은 바로 적용이 안되길래 getSchedule로 가져옴
     }
 
     @DeleteMapping("/schedule/{scheduleId}")
-    public void delete(@PathVariable Long scheduleId) {
+    public void delete(@PathVariable long scheduleId) {
         scheduleService.delete(scheduleId);
     }
 
     @GetMapping("/schedule/{scheduleId}/user/{userId}")
-    public void addUserToSchedule(@PathVariable Long scheduleId, @PathVariable Long userId) {
+    public void addUserToSchedule(@PathVariable long scheduleId, @PathVariable long userId) {
         scheduleService.addUserToSchedule(scheduleId, userId);
     }
 }
