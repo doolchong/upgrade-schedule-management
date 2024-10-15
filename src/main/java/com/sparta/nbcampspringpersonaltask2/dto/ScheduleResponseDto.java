@@ -31,6 +31,5 @@ public class ScheduleResponseDto {
                 users,
                 schedule.getComments().stream().map(CommentResponseDto::commentToDto).toList()
         );
-
     }
 }
